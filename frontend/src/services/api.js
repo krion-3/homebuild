@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://unfogging-bonita-uncontributively.ngrok-free.dev/api',
+  headers: {
+    'ngrok-skip-browser-warning': 'true'
+  }
 });
 
 API.interceptors.request.use((config) => {
