@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
-
   return (
     <div style={styles.container}>
       {/* Navbar */}
