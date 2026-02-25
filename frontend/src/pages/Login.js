@@ -88,6 +88,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     fontFamily: "'Segoe UI', sans-serif",
+    padding: '20px',
   },
   card: {
     backgroundColor: '#fff',
@@ -96,6 +97,7 @@ const styles = {
     width: '100%',
     maxWidth: '420px',
     boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+    margin: '0 16px',
   },
   logoSection: {
     textAlign: 'center',
