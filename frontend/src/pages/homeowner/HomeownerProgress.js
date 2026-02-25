@@ -13,6 +13,13 @@ const HomeownerProgress = () => {
   const [updates, setUpdates] = useState({});
   const [selectedProject, setSelectedProject] = useState(project_id || '');
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     fetchProjects();
@@ -63,41 +70,45 @@ const HomeownerProgress = () => {
   const progressPercent = milestones.length > 0 ? Math.round((completedCount / milestones.length) * 100) : 0;
 
   return (
-    <div style={styles.container}>
-      <div style={styles.sidebar}>
-        <div style={styles.sidebarLogo}>
-          <span>🏗️</span>
-          <span style={styles.logoText}>Homebuild</span>
-        </div>
-        <nav style={styles.nav}>
-          <div style={styles.navItem} onClick={() => navigate('/homeowner')}>📊 Dashboard</div>
-          <div style={styles.navItem} onClick={() => navigate('/homeowner/payments')}>💰 Payments</div>
-          <div style={{...styles.navItem, ...styles.navItemActive}}>📸 Progress</div>
-        </nav>
-        <div style={styles.sidebarBottom}>
-          <div style={styles.userInfo}>
-            <div style={styles.userAvatar}>👤</div>
-            <div>
-              <div style={styles.userName}>{user?.full_name}</div>
-              <div style={styles.userRole}>Homeowner</div>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F5F5F5', fontFamily: "'Segoe UI', sans-serif" }}>
+
+      {/* Sidebar - desktop only */}
+      {!isMobile && (
+        <div style={styles.sidebar}>
+          <div style={styles.sidebarLogo}>
+            <span>🏗️</span>
+            <span style={styles.logoText}>Homebuild</span>
+          </div>
+          <nav style={styles.nav}>
+            <div style={styles.navItem} onClick={() => navigate('/homeowner')}>📊 Dashboard</div>
+            <div style={styles.navItem} onClick={() => navigate('/homeowner/payments')}>💰 Payments</div>
+            <div style={{...styles.navItem, ...styles.navItemActive}}>📸 Progress</div>
+          </nav>
+          <div style={styles.sidebarBottom}>
+            <div style={styles.userInfo}>
+              <div style={styles.userAvatar}>👤</div>
+              <div>
+                <div style={styles.userName}>{user?.full_name}</div>
+                <div style={styles.userRole}>Homeowner</div>
+              </div>
+            </div>
+            <div style={styles.logoutBtn} onClick={() => { logoutUser(); navigate('/login'); }}>
+              🚪 <span>Logout</span>
             </div>
           </div>
-          <div style={styles.logoutBtn} onClick={() => { logoutUser(); navigate('/login'); }}>
-            🚪 <span>Logout</span>
-          </div>
         </div>
-      </div>
+      )}
 
-      <div style={styles.main}>
-        <div style={styles.header}>
-          <div>
-            <h1 style={styles.headerTitle}>Construction Progress</h1>
-            <p style={styles.headerSub}>Track your home building journey</p>
-          </div>
+      <div style={{ marginLeft: isMobile ? '0' : '240px', flex: 1, padding: isMobile ? '20px 16px 80px' : '32px' }}>
+        <div style={{ marginBottom: '24px' }}>
+          <h1 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '700', color: '#1B3A6B', margin: 0 }}>
+            Construction Progress
+          </h1>
+          <p style={{ color: '#888', margin: '4px 0 0 0', fontSize: '14px' }}>Track your home building journey</p>
         </div>
 
         <div style={styles.filterCard}>
-          <label style={styles.filterLabel}>Select Project:</label>
+          <label style={styles.filterLabel}>Project:</label>
           <select
             style={styles.filterSelect}
             value={selectedProject}
@@ -132,7 +143,7 @@ const HomeownerProgress = () => {
           milestones.map(milestone => (
             <div key={milestone.id} style={styles.milestoneCard}>
               <div style={styles.milestoneHeader}>
-                <div>
+                <div style={{ flex: 1 }}>
                   <h3 style={styles.milestoneTitle}>{milestone.title}</h3>
                   <p style={styles.milestoneSub}>{milestone.description}</p>
                   <p style={styles.milestoneDue}>
@@ -150,7 +161,7 @@ const HomeownerProgress = () => {
               </div>
 
               {updates[milestone.id] && updates[milestone.id].length > 0 ? (
-                <div style={styles.photosGrid}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)', gap: '12px' }}>
                   {updates[milestone.id].map(update => (
                     <div key={update.id} style={styles.photoCard}>
                       {update.photo_url ? (
@@ -177,12 +188,33 @@ const HomeownerProgress = () => {
           ))
         )}
       </div>
+
+      {/* Mobile Bottom Nav */}
+      {isMobile && (
+        <div style={styles.bottomNav}>
+          <div style={styles.bottomNavItem} onClick={() => navigate('/homeowner')}>
+            <div style={styles.bottomNavIcon}>📊</div>
+            <div style={styles.bottomNavLabel}>Dashboard</div>
+          </div>
+          <div style={styles.bottomNavItem} onClick={() => navigate('/homeowner/payments')}>
+            <div style={styles.bottomNavIcon}>💰</div>
+            <div style={styles.bottomNavLabel}>Payments</div>
+          </div>
+          <div style={styles.bottomNavItem} onClick={() => navigate('/homeowner/progress')}>
+            <div style={styles.bottomNavIcon}>📸</div>
+            <div style={styles.bottomNavLabel}>Progress</div>
+          </div>
+          <div style={styles.bottomNavItem} onClick={() => { logoutUser(); navigate('/login'); }}>
+            <div style={styles.bottomNavIcon}>🚪</div>
+            <div style={styles.bottomNavLabel}>Logout</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 const styles = {
-  container: { display: 'flex', minHeight: '100vh', backgroundColor: '#F5F5F5', fontFamily: "'Segoe UI', sans-serif" },
   sidebar: { width: '240px', backgroundColor: '#1B3A6B', display: 'flex', flexDirection: 'column', padding: '24px 0', position: 'fixed', height: '100vh', overflowY: 'hidden' },
   sidebarLogo: { display: 'flex', alignItems: 'center', gap: '10px', padding: '0 24px 32px 24px', borderBottom: '1px solid rgba(255,255,255,0.1)' },
   logoText: { color: '#fff', fontSize: '20px', fontWeight: '700' },
@@ -195,36 +227,35 @@ const styles = {
   userName: { color: '#fff', fontSize: '13px', fontWeight: '600' },
   userRole: { color: 'rgba(255,255,255,0.5)', fontSize: '12px' },
   logoutBtn: { padding: '14px 24px', color: '#fff', cursor: 'pointer', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#EF4444', margin: '12px', borderRadius: '8px', fontWeight: '600' },
-  main: { marginLeft: '240px', flex: 1, padding: '32px' },
-  header: { marginBottom: '32px' },
-  headerTitle: { fontSize: '28px', fontWeight: '700', color: '#1B3A6B', margin: 0 },
-  headerSub: { color: '#888', margin: '4px 0 0 0' },
-  filterCard: { backgroundColor: '#fff', borderRadius: '12px', padding: '20px 24px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px' },
+  filterCard: { backgroundColor: '#fff', borderRadius: '12px', padding: '16px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' },
   filterLabel: { fontSize: '14px', fontWeight: '600', color: '#1B3A6B', whiteSpace: 'nowrap' },
   filterSelect: { padding: '10px 16px', borderRadius: '8px', border: '1.5px solid #E0E0E0', fontSize: '14px', flex: 1, outline: 'none' },
-  progressCard: { backgroundColor: '#fff', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: '24px' },
+  progressCard: { backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: '20px' },
   progressHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' },
   progressLabel: { fontSize: '16px', fontWeight: '600', color: '#1B3A6B' },
   progressPercent: { fontSize: '24px', fontWeight: '700', color: '#F97316' },
   progressBar: { backgroundColor: '#F0F0F0', borderRadius: '8px', height: '12px', overflow: 'hidden', marginBottom: '8px' },
   progressFill: { backgroundColor: '#F97316', height: '100%', borderRadius: '8px', transition: 'width 0.5s ease' },
   progressSub: { fontSize: '13px', color: '#888', margin: 0 },
-  section: { backgroundColor: '#fff', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
-  emptyText: { textAlign: 'center', color: '#888', padding: '32px 0' },
-  milestoneCard: { backgroundColor: '#fff', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: '24px' },
-  milestoneHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' },
-  milestoneTitle: { fontSize: '18px', fontWeight: '700', color: '#1B3A6B', margin: '0 0 4px 0' },
+  section: { backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
+  emptyText: { textAlign: 'center', color: '#888', padding: '24px 0' },
+  milestoneCard: { backgroundColor: '#fff', borderRadius: '12px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', marginBottom: '20px' },
+  milestoneHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', gap: '12px' },
+  milestoneTitle: { fontSize: '17px', fontWeight: '700', color: '#1B3A6B', margin: '0 0 4px 0' },
   milestoneSub: { fontSize: '14px', color: '#888', margin: '0 0 4px 0' },
   milestoneDue: { fontSize: '13px', color: '#F97316', fontWeight: '600', margin: 0 },
   completedAt: { color: '#10B981' },
-  badge: { color: '#fff', padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: '600', whiteSpace: 'nowrap' },
-  photosGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' },
+  badge: { color: '#fff', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600', whiteSpace: 'nowrap' },
   photoCard: { borderRadius: '10px', overflow: 'hidden', border: '1.5px solid #E0E0E0' },
-  photo: { width: '100%', height: '180px', objectFit: 'cover', cursor: 'pointer', display: 'block' },
-  noPhoto: { height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F5F5F5', fontSize: '24px', color: '#aaa' },
+  photo: { width: '100%', height: '160px', objectFit: 'cover', cursor: 'pointer', display: 'block' },
+  noPhoto: { height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F5F5F5', fontSize: '24px', color: '#aaa' },
   photoCaption: { padding: '10px 12px 4px', fontSize: '13px', fontWeight: '600', color: '#333' },
   photoMeta: { padding: '0 12px 10px', fontSize: '12px', color: '#888' },
   noUpdates: { color: '#aaa', fontSize: '14px', textAlign: 'center', padding: '16px 0', margin: 0 },
+  bottomNav: { position: 'fixed', bottom: 0, left: 0, right: 0, backgroundColor: '#1B3A6B', display: 'flex', justifyContent: 'space-around', padding: '10px 0', zIndex: 100, boxShadow: '0 -2px 10px rgba(0,0,0,0.15)' },
+  bottomNavItem: { display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', padding: '4px 12px' },
+  bottomNavIcon: { fontSize: '22px' },
+  bottomNavLabel: { color: 'rgba(255,255,255,0.8)', fontSize: '11px', marginTop: '2px' },
 };
 
 export default HomeownerProgress;
