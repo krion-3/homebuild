@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div style={styles.container}>
@@ -25,8 +26,8 @@ const Landing = () => {
             Build Your Dream Home <span style={styles.heroHighlight}>With Confidence</span>
           </h1>
           <p style={styles.heroSub}>
-            Homebuild connects new homeowners with established construction firms. 
-            We fund 70% of your build, manage the entire construction process, 
+            Homebuild connects new homeowners with established construction firms.
+            We fund 70% of your build, manage the entire construction process,
             and keep you updated every step of the way.
           </p>
           <div style={styles.heroActions}>
@@ -56,7 +57,7 @@ const Landing = () => {
             </div>
           </div>
         </div>
-        <div style={styles.heroImage}>
+        <div style={styles.heroImageWrapper}>
           <div style={styles.heroCard}>
             <div style={styles.heroCardHeader}>
               <span style={styles.heroCardIcon}>🏠</span>
@@ -184,28 +185,30 @@ const Landing = () => {
   );
 };
 
+const isMobile = window.innerWidth <= 768;
+
 const styles = {
   container: { fontFamily: "'Segoe UI', sans-serif", color: '#333' },
-  navbar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 80px', backgroundColor: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', position: 'sticky', top: 0, zIndex: 100 },
+  navbar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: isMobile ? '16px 20px' : '20px 80px', backgroundColor: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', position: 'sticky', top: 0, zIndex: 100 },
   navLogo: { display: 'flex', alignItems: 'center', gap: '10px' },
-  navLogoIcon: { fontSize: '28px' },
-  navLogoText: { fontSize: '22px', fontWeight: '700', color: '#1B3A6B' },
-  loginBtn: { backgroundColor: '#F97316', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 24px', fontSize: '15px', fontWeight: '600', cursor: 'pointer' },
-  hero: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', padding: '80px', backgroundColor: '#fff', alignItems: 'center', minHeight: '90vh' },
+  navLogoIcon: { fontSize: '24px' },
+  navLogoText: { fontSize: isMobile ? '18px' : '22px', fontWeight: '700', color: '#1B3A6B' },
+  loginBtn: { backgroundColor: '#F97316', color: '#fff', border: 'none', borderRadius: '8px', padding: isMobile ? '8px 16px' : '10px 24px', fontSize: isMobile ? '13px' : '15px', fontWeight: '600', cursor: 'pointer' },
+  hero: { display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '32px' : '60px', padding: isMobile ? '40px 20px' : '80px', backgroundColor: '#fff', alignItems: 'center' },
   heroContent: { display: 'flex', flexDirection: 'column', gap: '24px' },
-  heroBadge: { display: 'inline-block', backgroundColor: '#FFF7ED', color: '#F97316', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: '600', width: 'fit-content' },
-  heroTitle: { fontSize: '52px', fontWeight: '800', color: '#1B3A6B', lineHeight: '1.2', margin: 0 },
+  heroBadge: { display: 'inline-block', backgroundColor: '#FFF7ED', color: '#F97316', padding: '8px 16px', borderRadius: '20px', fontSize: '13px', fontWeight: '600', width: 'fit-content' },
+  heroTitle: { fontSize: isMobile ? '32px' : '52px', fontWeight: '800', color: '#1B3A6B', lineHeight: '1.2', margin: 0 },
   heroHighlight: { color: '#F97316' },
-  heroSub: { fontSize: '18px', color: '#888', lineHeight: '1.6', margin: 0 },
-  heroActions: { display: 'flex', gap: '16px' },
-  heroBtn: { backgroundColor: '#F97316', color: '#fff', border: 'none', borderRadius: '10px', padding: '16px 32px', fontSize: '16px', fontWeight: '700', cursor: 'pointer' },
-  heroBtnOutline: { backgroundColor: '#fff', color: '#1B3A6B', border: '2px solid #1B3A6B', borderRadius: '10px', padding: '16px 32px', fontSize: '16px', fontWeight: '700', cursor: 'pointer' },
-  heroStats: { display: 'flex', gap: '32px', alignItems: 'center' },
+  heroSub: { fontSize: isMobile ? '15px' : '18px', color: '#888', lineHeight: '1.6', margin: 0 },
+  heroActions: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
+  heroBtn: { backgroundColor: '#F97316', color: '#fff', border: 'none', borderRadius: '10px', padding: isMobile ? '12px 24px' : '16px 32px', fontSize: isMobile ? '14px' : '16px', fontWeight: '700', cursor: 'pointer' },
+  heroBtnOutline: { backgroundColor: '#fff', color: '#1B3A6B', border: '2px solid #1B3A6B', borderRadius: '10px', padding: isMobile ? '12px 24px' : '16px 32px', fontSize: isMobile ? '14px' : '16px', fontWeight: '700', cursor: 'pointer' },
+  heroStats: { display: 'flex', gap: isMobile ? '16px' : '32px', alignItems: 'center' },
   heroStat: { textAlign: 'center' },
-  heroStatNumber: { fontSize: '28px', fontWeight: '800', color: '#1B3A6B' },
-  heroStatLabel: { fontSize: '13px', color: '#888' },
+  heroStatNumber: { fontSize: isMobile ? '22px' : '28px', fontWeight: '800', color: '#1B3A6B' },
+  heroStatLabel: { fontSize: '12px', color: '#888' },
   heroStatDivider: { width: '1px', height: '40px', backgroundColor: '#E0E0E0' },
-  heroImage: { display: 'flex', justifyContent: 'center' },
+  heroImageWrapper: { display: isMobile ? 'none' : 'flex', justifyContent: 'center' },
   heroCard: { backgroundColor: '#fff', borderRadius: '20px', padding: '28px', boxShadow: '0 20px 60px rgba(0,0,0,0.12)', width: '100%', maxWidth: '380px' },
   heroCardHeader: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' },
   heroCardIcon: { fontSize: '32px' },
@@ -220,28 +223,28 @@ const styles = {
   heroCardStat: { textAlign: 'center' },
   heroCardStatValue: { fontSize: '14px', fontWeight: '700', color: '#1B3A6B' },
   heroCardStatLabel: { fontSize: '11px', color: '#888', marginTop: '2px' },
-  section: { padding: '80px', backgroundColor: '#fff' },
-  sectionTitle: { fontSize: '36px', fontWeight: '800', color: '#1B3A6B', textAlign: 'center', margin: '0 0 12px 0' },
-  sectionSub: { fontSize: '16px', color: '#888', textAlign: 'center', marginBottom: '48px' },
-  stepsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' },
-  step: { textAlign: 'center', position: 'relative' },
-  stepNumber: { width: '32px', height: '32px', backgroundColor: '#F97316', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '14px', margin: '0 auto 16px' },
-  stepIcon: { fontSize: '40px', marginBottom: '16px' },
-  stepTitle: { fontSize: '18px', fontWeight: '700', color: '#1B3A6B', marginBottom: '12px' },
-  stepDesc: { fontSize: '14px', color: '#888', lineHeight: '1.6' },
-  featuresGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' },
-  featureCard: { backgroundColor: '#fff', borderRadius: '16px', padding: '28px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
-  featureIcon: { fontSize: '36px', marginBottom: '16px' },
-  featureTitle: { fontSize: '18px', fontWeight: '700', color: '#1B3A6B', marginBottom: '8px' },
-  featureDesc: { fontSize: '14px', color: '#888', lineHeight: '1.6', margin: 0 },
-  cta: { backgroundColor: '#1B3A6B', padding: '80px', textAlign: 'center' },
-  ctaTitle: { fontSize: '36px', fontWeight: '800', color: '#fff', margin: '0 0 16px 0' },
-  ctaSub: { fontSize: '18px', color: 'rgba(255,255,255,0.7)', marginBottom: '32px' },
-  ctaBtn: { backgroundColor: '#F97316', color: '#fff', border: 'none', borderRadius: '10px', padding: '18px 40px', fontSize: '18px', fontWeight: '700', cursor: 'pointer' },
-  footer: { backgroundColor: '#0F2447', padding: '32px 80px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  section: { padding: isMobile ? '48px 20px' : '80px', backgroundColor: '#fff' },
+  sectionTitle: { fontSize: isMobile ? '26px' : '36px', fontWeight: '800', color: '#1B3A6B', textAlign: 'center', margin: '0 0 12px 0' },
+  sectionSub: { fontSize: isMobile ? '14px' : '16px', color: '#888', textAlign: 'center', marginBottom: '40px' },
+  stepsGrid: { display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isMobile ? '24px' : '32px' },
+  step: { textAlign: 'center' },
+  stepNumber: { width: '32px', height: '32px', backgroundColor: '#F97316', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '14px', margin: '0 auto 12px' },
+  stepIcon: { fontSize: isMobile ? '32px' : '40px', marginBottom: '12px' },
+  stepTitle: { fontSize: isMobile ? '14px' : '18px', fontWeight: '700', color: '#1B3A6B', marginBottom: '8px' },
+  stepDesc: { fontSize: isMobile ? '12px' : '14px', color: '#888', lineHeight: '1.6' },
+  featuresGrid: { display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)', gap: '16px' },
+  featureCard: { backgroundColor: '#fff', borderRadius: '16px', padding: isMobile ? '20px' : '28px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
+  featureIcon: { fontSize: isMobile ? '28px' : '36px', marginBottom: '12px' },
+  featureTitle: { fontSize: isMobile ? '14px' : '18px', fontWeight: '700', color: '#1B3A6B', marginBottom: '8px' },
+  featureDesc: { fontSize: isMobile ? '12px' : '14px', color: '#888', lineHeight: '1.6', margin: 0 },
+  cta: { backgroundColor: '#1B3A6B', padding: isMobile ? '48px 20px' : '80px', textAlign: 'center' },
+  ctaTitle: { fontSize: isMobile ? '24px' : '36px', fontWeight: '800', color: '#fff', margin: '0 0 16px 0' },
+  ctaSub: { fontSize: isMobile ? '14px' : '18px', color: 'rgba(255,255,255,0.7)', marginBottom: '32px' },
+  ctaBtn: { backgroundColor: '#F97316', color: '#fff', border: 'none', borderRadius: '10px', padding: isMobile ? '14px 28px' : '18px 40px', fontSize: isMobile ? '15px' : '18px', fontWeight: '700', cursor: 'pointer' },
+  footer: { backgroundColor: '#0F2447', padding: isMobile ? '24px 20px' : '32px 80px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: 'center', gap: '12px' },
   footerLogo: { display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px' },
   footerLogoText: { color: '#fff', fontWeight: '700' },
-  footerText: { color: 'rgba(255,255,255,0.5)', fontSize: '14px' },
+  footerText: { color: 'rgba(255,255,255,0.5)', fontSize: '14px', margin: 0 },
 };
 
 export default Landing;
