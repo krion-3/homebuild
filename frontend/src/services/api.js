@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'https://unfogging-bonita-uncontributively.ngrok-free.dev/api',
+  baseURL: 'http://localhost:5000/api',
   headers: {
     'ngrok-skip-browser-warning': 'true'
   }
@@ -43,5 +43,7 @@ export const getMyPayments = () => API.get('/payments/my');
 export const getProjectPayments = (project_id) => API.get(`/payments/project/${project_id}`);
 export const getPaymentSummary = (project_id) => API.get(`/payments/summary/${project_id}`);
 export const updatePaymentStatus = (id, data) => API.patch(`/payments/${id}/status`, data);
+
+export const getAllPayments = () => API.get('/payments');
 
 export default API;

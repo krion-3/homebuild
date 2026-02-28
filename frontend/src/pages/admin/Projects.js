@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 
 const Projects = () => {
-  const { logoutUser } = useAuth();
+  const { user, logoutUser } = useAuth();
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [properties, setProperties] = useState([]);
@@ -16,19 +16,19 @@ const Projects = () => {
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [search, setSearch] = useState('');
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [form, setForm] = useState({
-    property_id: '',
-    firm_id: '',
-    engineer_id: '',
-    total_cost: '',
-    start_date: '',
-    expected_end_date: ''
+    property_id: '', firm_id: '', engineer_id: '', total_cost: '', start_date: '', expected_end_date: ''
   });
   const [milestoneForm, setMilestoneForm] = useState({
-    title: '',
-    description: '',
-    due_date: ''
+    title: '', description: '', due_date: ''
   });
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -103,46 +103,109 @@ const Projects = () => {
   );
 
   return (
-    <div style={styles.container}>
-      <div style={styles.sidebar}>
-        <div style={styles.sidebarLogo}>
-          <span>🏗️</span>
-          <span style={styles.logoText}>Homebuild</span>
-        </div>
-        <nav style={styles.nav}>
-          <div style={styles.navItem} onClick={() => navigate('/admin')}>📊 Dashboard</div>
-          <div style={styles.navItem} onClick={() => navigate('/admin/users')}>👥 Users</div>
-          <div style={styles.navItem} onClick={() => navigate('/admin/properties')}>🏠 Properties</div>
-          <div style={{...styles.navItem, ...styles.navItemActive}}>🏗️ Projects</div>
-          <div style={styles.navItem} onClick={() => navigate('/admin/payments')}>💰 Payments</div>
-        </nav>
-        <div style={styles.sidebarBottom}>
-          <div style={styles.logoutBtn} onClick={() => { logoutUser(); navigate('/login'); }}>
-            🚪 <span>Logout</span>
-          </div>
-        </div>
-      </div>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F5F5F5', fontFamily: "'Segoe UI', sans-serif" }}>
 
-      <div style={styles.main}>
-        <div style={styles.header}>
-          <div>
-            <h1 style={styles.headerTitle}>Projects</h1>
-            <p style={styles.headerSub}>Manage all construction projects</p>
+      {/* Sidebar - desktop only */}
+      {!isMobile && (
+        <div style={styles.sidebar}>
+          <div style={styles.sidebarLogo}>
+            <span>🏗️</span>
+            <span style={styles.logoText}>Homebuild</span>
           </div>
-          <div style={styles.headerRight}>
+          <nav style={styles.nav}>
+            <div style={styles.navItem} onClick={() => navigate('/admin')}>📊 Dashboard</div>
+            <div style={styles.navItem} onClick={() => navigate('/admin/users')}>👥 Users</div>
+            <div style={styles.navItem} onClick={() => navigate('/admin/properties')}>🏠 Properties</div>
+            <div style={{...styles.navItem, ...styles.navItemActive}}>🏗️ Projects</div>
+            <div style={styles.navItem} onClick={() => navigate('/admin/payments')}>💰 Payments</div>
+          </nav>
+          <div style={styles.sidebarBottom}>
+            <div style={styles.userInfo}>
+              <div style={styles.userAvatar}>👤</div>
+              <div>
+                <div style={styles.userName}>{user?.full_name}</div>
+                <div style={styles.userRole}>Administrator</div>
+              </div>
+            </div>
+            <div style={styles.logoutBtn} onClick={() => { logoutUser(); navigate('/login'); }}>
+              🚪 <span>Logout</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ marginLeft: isMobile ? '0' : '240px', flex: 1, padding: isMobile ? '20px 16px 80px' : '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <h1 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '700', color: '#1B3A6B', margin: 0 }}>Projects</h1>
+            <p style={{ color: '#888', margin: '4px 0 0 0', fontSize: '14px' }}>Manage all construction projects</p>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
             <input
-              style={styles.searchInput}
-              placeholder="🔍 Search projects..."
+              style={{ ...styles.searchInput, width: isMobile ? '140px' : '200px' }}
+              placeholder="🔍 Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
             <button style={styles.createBtn} onClick={() => setShowModal(true)}>
-              ➕ New Project
+              ➕ {isMobile ? '' : 'New Project'}
             </button>
           </div>
         </div>
 
-        {loading ? <p>Loading projects...</p> : (
+        {loading ? <p>Loading projects...</p> : isMobile ? (
+          // Mobile: card layout
+          <div>
+            {filteredProjects.length === 0 ? (
+              <p style={styles.emptyText}>No projects found.</p>
+            ) : (
+              filteredProjects.map(project => (
+                <div key={project.id} style={styles.projectCard}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                    <div>
+                      <div style={{ fontSize: '15px', fontWeight: '700', color: '#1B3A6B' }}>{project.location}</div>
+                      <div style={{ fontSize: '13px', color: '#888' }}>Owner: {project.homeowner_name}</div>
+                      <div style={{ fontSize: '13px', color: '#888' }}>Firm: {project.firm_name}</div>
+                      <div style={{ fontSize: '13px', color: '#888' }}>Engineer: {project.engineer_name}</div>
+                    </div>
+                    <span style={{...styles.badge, backgroundColor: statusColor(project.status)}}>
+                      {project.status}
+                    </span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', backgroundColor: '#F5F5F5', borderRadius: '8px', padding: '10px', marginBottom: '12px' }}>
+                    <div>
+                      <div style={{ fontSize: '11px', color: '#888' }}>Total Cost</div>
+                      <div style={{ fontSize: '13px', fontWeight: '600', color: '#1B3A6B' }}>KES {Number(project.total_cost).toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '11px', color: '#888' }}>Funded (70%)</div>
+                      <div style={{ fontSize: '13px', fontWeight: '600', color: '#1B3A6B' }}>KES {Number(project.funded_amount).toLocaleString()}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <select
+                      style={{ ...styles.statusSelect, flex: 1 }}
+                      value={project.status}
+                      onChange={(e) => handleStatusUpdate(project.id, e.target.value)}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="active">Active</option>
+                      <option value="completed">Completed</option>
+                      <option value="suspended">Suspended</option>
+                    </select>
+                    <button
+                      style={styles.milestoneBtn}
+                      onClick={() => { setSelectedProjectId(project.id); setShowMilestoneModal(true); }}
+                    >
+                      + Milestone
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        ) : (
+          // Desktop: table layout
           <div style={styles.tableCard}>
             <table style={styles.table}>
               <thead>
@@ -159,9 +222,7 @@ const Projects = () => {
               </thead>
               <tbody>
                 {filteredProjects.length === 0 ? (
-                  <tr>
-                    <td colSpan="8" style={styles.emptyText}>No projects found</td>
-                  </tr>
+                  <tr><td colSpan="8" style={styles.emptyText}>No projects found</td></tr>
                 ) : (
                   filteredProjects.map(project => (
                     <tr key={project.id} style={styles.tableRow}>
@@ -204,6 +265,32 @@ const Projects = () => {
           </div>
         )}
       </div>
+
+      {/* Mobile Bottom Nav */}
+      {isMobile && (
+        <div style={styles.bottomNav}>
+          <div style={styles.bottomNavItem} onClick={() => navigate('/admin')}>
+            <div style={styles.bottomNavIcon}>📊</div>
+            <div style={styles.bottomNavLabel}>Home</div>
+          </div>
+          <div style={styles.bottomNavItem} onClick={() => navigate('/admin/users')}>
+            <div style={styles.bottomNavIcon}>👥</div>
+            <div style={styles.bottomNavLabel}>Users</div>
+          </div>
+          <div style={styles.bottomNavItem} onClick={() => navigate('/admin/projects')}>
+            <div style={styles.bottomNavIcon}>🏗️</div>
+            <div style={styles.bottomNavLabel}>Projects</div>
+          </div>
+          <div style={styles.bottomNavItem} onClick={() => navigate('/admin/payments')}>
+            <div style={styles.bottomNavIcon}>💰</div>
+            <div style={styles.bottomNavLabel}>Payments</div>
+          </div>
+          <div style={styles.bottomNavItem} onClick={() => { logoutUser(); navigate('/login'); }}>
+            <div style={styles.bottomNavIcon}>🚪</div>
+            <div style={styles.bottomNavLabel}>Logout</div>
+          </div>
+        </div>
+      )}
 
       {/* Create Project Modal */}
       {showModal && (
@@ -305,7 +392,6 @@ const Projects = () => {
 };
 
 const styles = {
-  container: { display: 'flex', minHeight: '100vh', backgroundColor: '#F5F5F5', fontFamily: "'Segoe UI', sans-serif" },
   sidebar: { width: '240px', backgroundColor: '#1B3A6B', display: 'flex', flexDirection: 'column', padding: '24px 0', position: 'fixed', height: '100vh', overflowY: 'hidden' },
   sidebarLogo: { display: 'flex', alignItems: 'center', gap: '10px', padding: '0 24px 32px 24px', borderBottom: '1px solid rgba(255,255,255,0.1)' },
   logoText: { color: '#fff', fontSize: '20px', fontWeight: '700' },
@@ -313,32 +399,36 @@ const styles = {
   navItem: { padding: '14px 24px', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '15px', borderLeft: '3px solid transparent' },
   navItemActive: { color: '#fff', backgroundColor: 'rgba(255,255,255,0.1)', borderLeft: '3px solid #F97316' },
   sidebarBottom: { borderTop: '1px solid rgba(255,255,255,0.1)', position: 'sticky', bottom: 0, backgroundColor: '#1B3A6B' },
+  userInfo: { display: 'flex', alignItems: 'center', gap: '10px', padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.1)' },
+  userAvatar: { fontSize: '24px' },
+  userName: { color: '#fff', fontSize: '13px', fontWeight: '600' },
+  userRole: { color: 'rgba(255,255,255,0.5)', fontSize: '12px' },
   logoutBtn: { padding: '14px 24px', color: '#fff', cursor: 'pointer', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#EF4444', margin: '12px', borderRadius: '8px', fontWeight: '600' },
-  main: { marginLeft: '240px', flex: 1, padding: '32px' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' },
-  headerTitle: { fontSize: '28px', fontWeight: '700', color: '#1B3A6B', margin: 0 },
-  headerSub: { color: '#888', margin: '4px 0 0 0' },
-  headerRight: { display: 'flex', gap: '12px', alignItems: 'center' },
-  searchInput: { padding: '12px 16px', borderRadius: '8px', border: '1.5px solid #E0E0E0', fontSize: '14px', outline: 'none', width: '240px' },
-  createBtn: { backgroundColor: '#F97316', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px 20px', fontSize: '15px', fontWeight: '600', cursor: 'pointer' },
+  searchInput: { padding: '10px 16px', borderRadius: '8px', border: '1.5px solid #E0E0E0', fontSize: '14px', outline: 'none' },
+  createBtn: { backgroundColor: '#F97316', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 16px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
+  projectCard: { backgroundColor: '#fff', borderRadius: '12px', padding: '16px', marginBottom: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' },
+  emptyText: { padding: '32px', textAlign: 'center', color: '#888' },
   tableCard: { backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', overflow: 'hidden' },
   table: { width: '100%', borderCollapse: 'collapse' },
   tableHeader: { backgroundColor: '#F5F5F5' },
   th: { padding: '14px 16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: '#888', textTransform: 'uppercase' },
   tableRow: { borderBottom: '1px solid #F0F0F0' },
   td: { padding: '14px 16px', fontSize: '14px', color: '#333' },
-  emptyText: { padding: '32px', textAlign: 'center', color: '#888' },
   badge: { color: '#fff', padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '600' },
   statusSelect: { padding: '6px 10px', borderRadius: '6px', border: '1.5px solid #E0E0E0', fontSize: '13px', cursor: 'pointer' },
   milestoneBtn: { backgroundColor: '#1B3A6B', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontWeight: '600', whiteSpace: 'nowrap' },
-  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
-  modal: { backgroundColor: '#fff', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '440px', maxHeight: '90vh', overflowY: 'auto' },
+  bottomNav: { position: 'fixed', bottom: 0, left: 0, right: 0, backgroundColor: '#1B3A6B', display: 'flex', justifyContent: 'space-around', padding: '10px 0', zIndex: 100, boxShadow: '0 -2px 10px rgba(0,0,0,0.15)' },
+  bottomNavItem: { display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', padding: '4px 8px' },
+  bottomNavIcon: { fontSize: '22px' },
+  bottomNavLabel: { color: 'rgba(255,255,255,0.8)', fontSize: '11px', marginTop: '2px' },
+  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '16px' },
+  modal: { backgroundColor: '#fff', borderRadius: '16px', padding: '28px', width: '100%', maxWidth: '440px', maxHeight: '90vh', overflowY: 'auto' },
   modalTitle: { fontSize: '20px', fontWeight: '700', color: '#1B3A6B', marginTop: 0, marginBottom: '4px' },
   modalSub: { color: '#888', fontSize: '14px', marginBottom: '20px' },
   form: { display: 'flex', flexDirection: 'column', gap: '16px' },
   input: { padding: '12px 16px', borderRadius: '8px', border: '1.5px solid #E0E0E0', fontSize: '15px', outline: 'none' },
   label: { fontSize: '13px', fontWeight: '600', color: '#888', marginBottom: '-8px' },
-  modalActions: { display: 'flex', gap: '12px', marginTop: '8px' },
+  modalActions: { display: 'flex', gap: '12px' },
   cancelBtn: { flex: 1, padding: '12px', borderRadius: '8px', border: '1.5px solid #E0E0E0', backgroundColor: '#fff', cursor: 'pointer', fontSize: '15px' },
   submitBtn: { flex: 1, padding: '12px', borderRadius: '8px', border: 'none', backgroundColor: '#F97316', color: '#fff', cursor: 'pointer', fontSize: '15px', fontWeight: '600' },
 };

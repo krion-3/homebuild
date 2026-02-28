@@ -22,6 +22,28 @@ const makePayment = async (req, res) => {
   }
 };
 
+// Get all payments (admin)
+const getAllPayments = async (req, res) => {
+  try {
+    const result = await db.query(
+      `SELECT 
+        p.*,
+        u.full_name AS homeowner_name,
+        pr.location
+       FROM payments p
+       LEFT JOIN users u ON p.homeowner_id = u.id
+       LEFT JOIN projects pj ON p.project_id = pj.id
+       LEFT JOIN properties pr ON pj.property_id = pr.id
+       ORDER BY p.payment_date DESC`
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // Get all payments for a project
 const getProjectPayments = async (req, res) => {
   try {
@@ -126,4 +148,4 @@ const getPaymentSummary = async (req, res) => {
   }
 };
 
-module.exports = { makePayment, getProjectPayments, getMyPayments, updatePaymentStatus, getPaymentSummary };
+module.exports = { makePayment, getAllPayments, getProjectPayments, getMyPayments, updatePaymentStatus, getPaymentSummary };
